@@ -15,6 +15,7 @@
   ],
   "suffix": ".bs.js",
   "namespace": true,
-  "bs-dependencies": ["reason-react", "bs-css"],
+  "bs-dependencies": ["reason-react", "bs-css", "reason-apollo"],
+  "ppx-flags": ["graphql_ppx/ppx"],
   "refmt": 3
 }

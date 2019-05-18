@@ -4,7 +4,8 @@ module NavStyles = {
     style([
       display(`flex),
       justifyContent(`spaceBetween),
-      background(hex(Theme.colorHighlight)),
+      background(hex(Theme.colorCyan)),
+      color(hex(Theme.colorBg)),
       position(`fixed),
       top(rem(0.)),
       left(rem(0.)),
@@ -29,26 +30,38 @@ module NavStyles = {
     ]);
   let brand =
     style([
-      margin(`zero),
+      marginLeft(rem(1.5)),
       display(`flex),
       justifyContent(`center),
       alignItems(`center),
       height(pct(100.)),
-      width(rem(7.)),
-      padding2(~v=rem(0.), ~h=rem(1.)),
+      width(rem(15.)),
     ]);
   let item =
     style([
+      position(`relative),
       display(`flex),
       justifyContent(`center),
       alignItems(`center),
       boxSizing(`borderBox),
       height(pct(100.)),
+      marginRight(rem(1.5)),
       padding2(~v=`zero, ~h=rem(1.)),
       cursor(`pointer),
+      before([
+        unsafe("content", ""),
+        position(`absolute),
+        left(pct(50.)),
+        bottom(pct(20.)),
+        width(pct(85.)),
+        height(px(2)),
+        backgroundColor(hex(Theme.colorBg)),
+        unsafe("transform-origin", "center"),
+        unsafe("transform", "translate(-50%, 0) scaleX(0)"),
+        unsafe("transition", "transform 0.3s ease-in-out"),
+      ]),
       hover([
-        color(hex(Theme.colorBg)),
-        `transition("color 250ms ease-in-out 0s"),
+        before([unsafe("transform", "translate(-50%, 0) scaleX(1)")]),
       ]),
     ]);
 };

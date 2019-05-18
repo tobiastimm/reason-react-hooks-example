@@ -1,7 +1,7 @@
 module GlobalStyles = {
   open Css;
   global("html", [fontSize(px(10))]);
-  global("html, body, #root", [height(pct(100.)), width(pct(100.))]);
+  global("html, body, #root", [height(pct(100.)), boxSizing(`borderBox)]);
   global(
     "*,
           *:before,
