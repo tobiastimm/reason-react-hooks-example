@@ -5,3 +5,5 @@ npm-debug.log
 /lib/bs/
 /node_modules/
 .graphql_ppx_cache
+yarn-error.log
+npm-error.log
