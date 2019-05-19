@@ -84,7 +84,9 @@ module Styles = {
 type featherProps = {size: int};
 
 [@react.component]
-let make = (~recipe) =>
+let make = (~recipe) => {
+  let handleEdit = id => ReasonReactRouter.push({j|recipe/$id/edit|j});
+
   <li className=Styles.card>
     <div className=Styles.cardImageWrapper>
       {switch (recipe##images) {
@@ -108,7 +110,8 @@ let make = (~recipe) =>
       </p>
     </div>
     <div className=Styles.cardActions>
-      <button className=Styles.cardAction>
+      <button
+        className=Styles.cardAction onClick={_ => handleEdit(recipe##id)}>
         <FeaterIcons.Edit color={"#" ++ Theme.colorButton} />
       </button>
       <button className=Styles.cardAction>
@@ -116,3 +119,4 @@ let make = (~recipe) =>
       </button>
     </div>
   </li>;
+};
