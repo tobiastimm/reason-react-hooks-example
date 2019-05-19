@@ -67,13 +67,22 @@ module NavStyles = {
 };
 
 [@react.component]
-let make = () =>
+let make = () => {
+  let navigateToRoute = (route: string) => ReasonReactRouter.push(route);
+
   <nav className=NavStyles.nav>
     <div className=NavStyles.brand>
       <h2> {React.string("Recipe Book")} </h2>
     </div>
     <div className=NavStyles.menu>
-      <a className=NavStyles.item> {React.string("Recipes")} </a>
-      <a className=NavStyles.item> {React.string("Shopping-List")} </a>
+      <a className=NavStyles.item onClick={_ => navigateToRoute("/")}>
+        {React.string("Recipes")}
+      </a>
+      <a
+        className=NavStyles.item
+        onClick={_ => navigateToRoute("/shoppingList")}>
+        {React.string("Shopping-List")}
+      </a>
     </div>
   </nav>;
+};
