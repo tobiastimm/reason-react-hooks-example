@@ -15,11 +15,11 @@ module Styles = {
 type page =
   | Home
   | ShoppingList
-  | RecipeEditPage;
+  | UpdateRecipePage;
 
 let mapUrlToRoute = (url: ReasonReact.Router.url) =>
   switch (url.path) {
-  | ["recipe", _id, "edit"] => RecipeEditPage
+  | ["recipe", _id, "edit"] => UpdateRecipePage
   | ["shoppingList"] => ShoppingList
   | [] => Home
   | _ => Home
@@ -56,7 +56,7 @@ let make = () => {
            <div className=Styles.content> <Recipes /> </div>
          </>
        | ShoppingList => <div> {"ShoppingList" |> React.string} </div>
-       | RecipeEditPage => <RecipeEdit />
+       | UpdateRecipePage => <UpdateRecipe />
        }}
     </main>
   </Layout>;
