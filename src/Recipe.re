@@ -112,10 +112,10 @@ let make = (~recipe) => {
     <div className=Styles.cardActions>
       <button
         className=Styles.cardAction onClick={_ => handleEdit(recipe##id)}>
-        <FeaterIcons.Edit color={"#" ++ Theme.colorButton} />
+        <FeatherIcons.Edit color={"#" ++ Theme.colorButton} />
       </button>
       <button className=Styles.cardAction>
-        <FeaterIcons.Trash color={"#" ++ Theme.colorButton} />
+        <FeatherIcons.Trash color={"#" ++ Theme.colorButton} />
       </button>
     </div>
   </li>;
