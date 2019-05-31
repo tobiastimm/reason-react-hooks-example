@@ -1,3 +1,6 @@
+exception GraphQLErrors(array(ReasonApolloTypes.graphqlError));
+exception EmptyResponse;
+
 module Styles = {
   open Css;
 
@@ -93,55 +96,175 @@ module GetRecipeById = [%graphql
 
 module GetRecipeByIdQuery = ReasonApollo.CreateQuery(GetRecipeById);
 
+module UpdateRecipeById = [%graphql
+  {|
+    mutation updateRecipeById($id: ID!, $title: String!, $description: String!){
+      updateRecipe(data: { title: $title, description: $description}, where: { id: $id}) {
+        id
+      }
+    }
+  |}
+];
+
+module UpdateRecipebyByIdMutation =
+  ReasonApollo.CreateMutation(UpdateRecipeById);
+
+type inputValue =
+  | Number(float)
+  | String(string);
+
 [@react.component]
 let make = () => {
+  let initialState: list((string, inputValue)) = [];
+  let (formState, setFormState) = React.useState(() => initialState);
+
+  let handleChange = (event: ReactEvent.Form.t) => {
+    let target = event->ReactEvent.Form.target;
+    let value =
+      switch (target##_type, target##value) {
+      | ("number", value) => Number(float_of_string(value))
+      | (_, value) => String(value)
+      };
+    setFormState(prevFormState =>
+      if (Util.containsKey(~value=target##name, prevFormState)) {
+        Util.replaceKey(
+          ~key=target##name,
+          ~with_=(target##name, value),
+          prevFormState,
+        );
+      } else {
+        [(target##name, value), ...prevFormState];
+      }
+    );
+  };
   let url = ReasonReactRouter.useUrl();
+
+  let rec getValueByKey =
+          (~key: 'a, ~default: 'a, l: list((string, inputValue))) => {
+    switch (l) {
+    | [] => default
+    | [(headKey, headValue), ...tail] =>
+      if (headKey == key) {
+        switch (headValue) {
+        | Number(number) => Js.Float.toString(number)
+        | String(value) => value
+        };
+      } else {
+        getValueByKey(~key, ~default, tail);
+      }
+    };
+  };
 
   <div className=Styles.container>
     <div className=Styles.card>
-      <form>
-        {switch (url.path) {
-         | ["recipe", id, "edit"] =>
-           let recipeByIdQuery = GetRecipeById.make(~id, ());
-           <GetRecipeByIdQuery variables=recipeByIdQuery##variables>
-             ...{({result}) =>
-               switch (result) {
-               | Loading => <div> {React.string("Loading")} </div>
-               | Error(error) => <div> {React.string(error##message)} </div>
-               | Data(response) =>
-                 let recipe =
-                   switch (response##recipe) {
-                   | Some(recipe) => recipe
-                   | None => {"id": "", "title": "", "description": ""}
-                   };
-                 <fieldset>
-                   <label htmlFor="name"> {"Name" |> React.string} </label>
-                   <input
-                     id="name"
-                     name="name"
-                     placeholder="Name of the recipe"
-                     required=true
-                     type_="text"
-                     value=recipe##title
-                   />
-                   <label htmlFor="description">
-                     {"Description" |> React.string}
-                   </label>
-                   <textarea
-                     id="description"
-                     name="description"
-                     placeholder="Description for the recipe"
-                     required=true
-                     value=recipe##description
-                   />
-                   <button type_="submit"> {"Submit" |> React.string} </button>
-                 </fieldset>;
-               }
+      {switch (url.path) {
+       | ["recipe", id, "edit"] =>
+         let goBack = result => {Js.log(result)};
+         let recipeByIdQuery = GetRecipeById.make(~id, ());
+         <GetRecipeByIdQuery variables=recipeByIdQuery##variables>
+           ...{({result}) =>
+             switch (result) {
+             | Loading => <div> {React.string("Loading")} </div>
+             | Error(error) => <div> {React.string(error##message)} </div>
+             | Data(response) =>
+               let recipe =
+                 switch (response##recipe) {
+                 | Some(recipe) => recipe
+                 | None => {"id": "", "title": "", "description": ""}
+                 };
+
+               <UpdateRecipebyByIdMutation>
+                 ...{(mutation, _ /* Result of your mutation */) => {
+                   let updateRecipeQuery =
+                     UpdateRecipeById.make(
+                       ~id=recipe##id,
+                       ~title=
+                         getValueByKey(
+                           ~key="name",
+                           ~default=recipe##title,
+                           formState,
+                         ),
+                       ~description=
+                         getValueByKey(
+                           ~key="description",
+                           ~default=recipe##description,
+                           formState,
+                         ),
+                       (),
+                     );
+                   <form
+                     onSubmit={(e: ReactEvent.Form.t) => {
+                       ReactEvent.Form.preventDefault(e);
+                       mutation(
+                         ~variables=updateRecipeQuery##variables,
+                         ~refetchQueries=[|"getRecipes"|],
+                         (),
+                       )
+                       |> Js.Promise.then_(res =>
+                            switch (
+                              (
+                                res:
+                                  ReasonApolloTypes.executionResponse(
+                                    UpdateRecipeById.t,
+                                  )
+                              )
+                            ) {
+                            | Data(_) =>
+                              ReasonReactRouter.push("/");
+                              Js.Promise.resolve();
+                            | Errors(error) =>
+                              Js.log(error);
+                              Js.Promise.reject(
+                                raise(GraphQLErrors(error)),
+                              );
+                            | EmptyResponse =>
+                              Js.Promise.reject(raise(EmptyResponse))
+                            }
+                          )
+                       |> ignore;
+                     }}>
+                     <fieldset>
+                       <label htmlFor="name"> {"Name" |> React.string} </label>
+                       <input
+                         id="name"
+                         name="name"
+                         placeholder="Name of the recipe"
+                         required=true
+                         type_="text"
+                         value={getValueByKey(
+                           ~key="name",
+                           ~default=recipe##title,
+                           formState,
+                         )}
+                         onChange=handleChange
+                       />
+                       <label htmlFor="description">
+                         {"Description" |> React.string}
+                       </label>
+                       <textarea
+                         id="description"
+                         name="description"
+                         placeholder="Description for the recipe"
+                         required=true
+                         value={getValueByKey(
+                           ~key="description",
+                           ~default=recipe##description,
+                           formState,
+                         )}
+                         onChange=handleChange
+                       />
+                       <button type_="submit">
+                         {"Submit" |> React.string}
+                       </button>
+                     </fieldset>
+                   </form>;
+                 }}
+               </UpdateRecipebyByIdMutation>;
              }
-           </GetRecipeByIdQuery>;
-         | _ => <> </>
-         }}
-      </form>
+           }
+         </GetRecipeByIdQuery>;
+       | _ => <> </>
+       }}
     </div>
   </div>;
 };
