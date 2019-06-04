@@ -1,7 +1,9 @@
-let inMemoryCache = ApolloInMemoryCache.createInMemoryCache();
+[@bs.val] external token: string = "process.env.API_TOKEN";
 
+[@bs.val] external uri: string = "process.env.API_ENDPOINT";
+
+let inMemoryCache = ApolloInMemoryCache.createInMemoryCache();
 let contextHandler = () => {
-  let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ2ZXJzaW9uIjoxLCJ0b2tlbklkIjoiNjI3Y2FkZGUtMjVkYy00MzZhLTlhMmYtZmMzMWY3OWY0YTYxIn0.L-90eKbtVaZG0JBnRWx85BIqJc9_Af3PRtMbTL1Fshg";
   let headers = {
     "headers": {
       "authorization": {j|Bearer $token|j},
@@ -12,11 +14,7 @@ let contextHandler = () => {
 
 let authLink = ApolloLinks.createContextLink(contextHandler);
 
-let httpLink =
-  ApolloLinks.createHttpLink(
-    ~uri="https://api-euwest.graphcms.com/v1/cjvtuzuav5tux01etrbx95u65/master",
-    (),
-  );
+let httpLink = ApolloLinks.createHttpLink(~uri, ());
 
 let instance =
   ReasonApollo.createApolloClient(

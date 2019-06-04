@@ -27,3 +27,17 @@ module Trash = {
     "color": color,
   };
 };
+module Plus = {
+  type props = {
+    .
+    "size": int,
+    "color": string,
+  };
+
+  [@bs.module "react-feather"] external make: props => React.element = "Plus";
+
+  let makeProps = (~size=24, ~color="#333", ()): props => {
+    "size": size,
+    "color": color,
+  };
+};

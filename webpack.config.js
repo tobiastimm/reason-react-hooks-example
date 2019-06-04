@@ -1,7 +1,8 @@
 const path = require('path')
+const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const outputDir = path.join(__dirname, 'build/')
-
+const dotenv = require('dotenv').config({ path: __dirname + '/.env' })
 const isProd = process.env.NODE_ENV === 'production'
 
 module.exports = {
@@ -12,6 +13,9 @@ module.exports = {
     filename: 'Index.js',
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(dotenv.parsed),
+    }),
     new HtmlWebpackPlugin({
       template: 'public/index.html',
       inject: false,

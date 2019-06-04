@@ -15,10 +15,12 @@ module Styles = {
 type page =
   | Home
   | ShoppingList
+  | CreateRecipePage
   | UpdateRecipePage;
 
 let mapUrlToRoute = (url: ReasonReact.Router.url) =>
   switch (url.path) {
+  | ["recipe", "new"] => CreateRecipePage
   | ["recipe", _id, "edit"] => UpdateRecipePage
   | ["shoppingList"] => ShoppingList
   | [] => Home
@@ -52,11 +54,17 @@ let make = () => {
       {switch (state.route) {
        | Home =>
          <>
-           <aside className=Styles.sidebar> {React.string("Sidebar")} </aside>
-           <div className=Styles.content> <Recipes /> </div>
+           <aside className=Styles.sidebar />
+           <div className=Styles.content>
+             <Recipes />
+             <FloatingActionButton
+               click={_ => ReasonReactRouter.push("/recipe/new")}
+             />
+           </div>
          </>
        | ShoppingList => <div> {"ShoppingList" |> React.string} </div>
        | UpdateRecipePage => <UpdateRecipe />
+       | CreateRecipePage => <CreateRecipe />
        }}
     </main>
   </Layout>;

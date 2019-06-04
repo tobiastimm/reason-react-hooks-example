@@ -8,3 +8,5 @@ npm-debug.log
 .graphql_ppx_cache
 yarn-error.log
 npm-error.log
+.env
+.env.*

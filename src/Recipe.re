@@ -92,7 +92,12 @@ let make = (~recipe) => {
       {switch (recipe##images) {
        | None => React.null
        | Some(images) =>
-         let image = ArrayLabels.get(images, 0);
+         let image =
+           if (Array.length(images) > 0) {
+             ArrayLabels.get(images, 0);
+           } else {
+             {"url": ""};
+           };
          let url = image##url;
          <div
            className=Styles.cardImage
