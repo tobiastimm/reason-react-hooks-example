@@ -1,3 +1,7 @@
+[@bs.val] external confirm: string => bool = "confirm";
+exception GraphQLErrors(array(ReasonApolloTypes.graphqlError));
+exception EmptyResponse;
+
 module Styles = {
   open Css;
 
@@ -80,6 +84,19 @@ module Styles = {
     ]);
 };
 
+module DeleteRecipeById = [%graphql
+  {|
+    mutation deleteRecipeById($id:ID!) {
+      deleteRecipe(where: { id: $id}) {
+        id
+      }
+    }
+|}
+];
+
+module DeleteRecipeByIdMutation =
+  ReasonApollo.CreateMutation(DeleteRecipeById);
+
 [@bs.deriving abstract]
 type featherProps = {size: int};
 
@@ -96,7 +113,7 @@ let make = (~recipe) => {
            if (Array.length(images) > 0) {
              ArrayLabels.get(images, 0);
            } else {
-             {"url": ""};
+             {"id": "", "url": ""};
            };
          let url = image##url;
          <div
@@ -119,9 +136,45 @@ let make = (~recipe) => {
         className=Styles.cardAction onClick={_ => handleEdit(recipe##id)}>
         <FeatherIcons.Edit color={"#" ++ Theme.colorButton} />
       </button>
-      <button className=Styles.cardAction>
-        <FeatherIcons.Trash color={"#" ++ Theme.colorButton} />
-      </button>
+      <DeleteRecipeByIdMutation>
+        ...{(mutation, _) => {
+          let deleteRecipeByIdMutation =
+            DeleteRecipeById.make(~id=recipe##id, ());
+          <button
+            onClick={_ => {
+              let doDelete =
+                confirm("Do you really want to delete this recipe?");
+              if (doDelete == true) {
+                mutation(
+                  ~variables=deleteRecipeByIdMutation##variables,
+                  ~refetchQueries=[|"getRecipes"|],
+                  (),
+                )
+                |> Js.Promise.then_(res =>
+                     switch (
+                       (
+                         res:
+                           ReasonApolloTypes.executionResponse(
+                             DeleteRecipeById.t,
+                           )
+                       )
+                     ) {
+                     | Data(_) => Js.Promise.resolve()
+                     | Errors(error) =>
+                       Js.log(error);
+                       Js.Promise.reject(raise(GraphQLErrors(error)));
+                     | EmptyResponse =>
+                       Js.Promise.reject(raise(EmptyResponse))
+                     }
+                   )
+                |> ignore;
+              };
+            }}
+            className=Styles.cardAction>
+            <FeatherIcons.Trash color={"#" ++ Theme.colorButton} />
+          </button>;
+        }}
+      </DeleteRecipeByIdMutation>
     </div>
   </li>;
 };
