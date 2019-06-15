@@ -140,76 +140,73 @@ let make = () => {
 
   <div className=Styles.container>
     <div className=Styles.card>
-      {
-        let goBack = result => Js.log(result);
-        <CreateRecipeMutation>
-          ...{(mutation, _) => {
-            let createRecipeQuery =
-              CreateRecipe.make(
-                ~title=getValueByKey(~key="name", ~default="", formState),
-                ~description=
-                  getValueByKey(~key="description", ~default="", formState),
-                (),
-              );
-            <form
-              onSubmit={(e: ReactEvent.Form.t) => {
-                ReactEvent.Form.preventDefault(e);
-                mutation(
-                  ~variables=createRecipeQuery##variables,
-                  ~refetchQueries=[|"getRecipes"|],
-                  (),
-                )
-                |> Js.Promise.then_(res =>
-                     switch (
-                       (
-                         res:
-                           ReasonApolloTypes.executionResponse(CreateRecipe.t)
-                       )
-                     ) {
-                     | Data(_) =>
-                       ReasonReactRouter.push("/");
-                       Js.Promise.resolve();
-                     | Errors(error) =>
-                       Js.log(error);
-                       Js.Promise.reject(raise(GraphQLErrors(error)));
-                     | EmptyResponse =>
-                       Js.Promise.reject(raise(EmptyResponse))
-                     }
-                   )
-                |> ignore;
-              }}>
-              <fieldset>
-                <label htmlFor="name"> {"Name" |> React.string} </label>
-                <input
-                  id="name"
-                  name="name"
-                  placeholder="Name of the recipe"
-                  required=true
-                  type_="text"
-                  value={getValueByKey(~key="name", ~default="", formState)}
-                  onChange=handleChange
-                />
-                <label htmlFor="description">
-                  {"Description" |> React.string}
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  placeholder="Description for the recipe"
-                  required=true
-                  value={getValueByKey(
-                    ~key="description",
-                    ~default="",
-                    formState,
-                  )}
-                  onChange=handleChange
-                />
-                <button type_="submit"> {"Submit" |> React.string} </button>
-              </fieldset>
-            </form>;
-          }}
-        </CreateRecipeMutation>;
-      }
+      {<CreateRecipeMutation>
+         ...{(mutation, _) => {
+           let createRecipeQuery =
+             CreateRecipe.make(
+               ~title=getValueByKey(~key="name", ~default="", formState),
+               ~description=
+                 getValueByKey(~key="description", ~default="", formState),
+               (),
+             );
+           <form
+             onSubmit={(e: ReactEvent.Form.t) => {
+               ReactEvent.Form.preventDefault(e);
+               mutation(
+                 ~variables=createRecipeQuery##variables,
+                 ~refetchQueries=[|"getRecipes"|],
+                 (),
+               )
+               |> Js.Promise.then_(res =>
+                    switch (
+                      (
+                        res:
+                          ReasonApolloTypes.executionResponse(CreateRecipe.t)
+                      )
+                    ) {
+                    | Data(_) =>
+                      ReasonReactRouter.push("/");
+                      Js.Promise.resolve();
+                    | Errors(error) =>
+                      Js.log(error);
+                      Js.Promise.reject(raise(GraphQLErrors(error)));
+                    | EmptyResponse =>
+                      Js.Promise.reject(raise(EmptyResponse))
+                    }
+                  )
+               |> ignore;
+             }}>
+             <fieldset>
+               <label htmlFor="name"> {"Name" |> React.string} </label>
+               <input
+                 id="name"
+                 name="name"
+                 placeholder="Name of the recipe"
+                 required=true
+                 type_="text"
+                 value={getValueByKey(~key="name", ~default="", formState)}
+                 onChange=handleChange
+               />
+               <label htmlFor="description">
+                 {"Description" |> React.string}
+               </label>
+               <textarea
+                 id="description"
+                 name="description"
+                 placeholder="Description for the recipe"
+                 required=true
+                 value={getValueByKey(
+                   ~key="description",
+                   ~default="",
+                   formState,
+                 )}
+                 onChange=handleChange
+               />
+               <button type_="submit"> {"Submit" |> React.string} </button>
+             </fieldset>
+           </form>;
+         }}
+       </CreateRecipeMutation>}
     </div>
   </div>;
 };

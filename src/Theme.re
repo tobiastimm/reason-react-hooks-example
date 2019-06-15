@@ -1,5 +1,3 @@
-open Css;
-
 let navHeight = 5.;
 let colorBg = "eeeeee";
 let colorHighlight = "00adb5";

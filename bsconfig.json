@@ -3,10 +3,16 @@
   "reason": {
     "react-jsx": 3
   },
-  "sources": {
-    "dir": "src",
-    "subdirs": true
-  },
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    },
+    {
+      "dir": "test",
+      "type": "dev"
+    }
+  ],
   "package-specs": [
     {
       "module": "commonjs",
@@ -15,6 +21,11 @@
   ],
   "suffix": ".bs.js",
   "namespace": true,
+  "bs-dev-dependencies": [
+    "@glennsl/bs-jest",
+    "bs-react-testing-library",
+    "bs-dom-testing-library"
+  ],
   "bs-dependencies": ["reason-react", "bs-css", "reason-apollo"],
   "ppx-flags": ["graphql_ppx/ppx"],
   "refmt": 3
