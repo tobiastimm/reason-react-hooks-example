@@ -8,7 +8,7 @@ describe("<Nav />", () => {
     result |> container |> expect |> toMatchSnapshot;
   });
 
-  test("should contain a header with 'Recipe Book'", () => {
+  test("should contains a header with 'Recipe Book'", () => {
     let result = render(<Nav />);
     result
     |> getByText(~matcher=`Str("Recipe Book"))

@@ -1,8 +1,7 @@
 open Jest;
+open Expect;
 
 describe("Util", () => {
-  open Expect;
-
   describe("contains", () => {
     test("should find the given item", () =>
       expect(Util.contains(~value="Test", ["bla", "blub", "Test"]))

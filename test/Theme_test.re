@@ -1,8 +1,7 @@
 open Jest;
+open Expect;
 
 describe("Theme", () => {
-  open Expect;
-
   test("navHeight to be 5.", () =>
     expect(Theme.navHeight) |> toBe(5.)
   );
